@@ -12,6 +12,7 @@ from collisions import *
 from gameover import *
 from dropdown import *
 from powerup_time import *
+from blaster import *
 from colorama import Fore, Back , Style
 
 
@@ -98,40 +99,43 @@ def Initialisation(level):
     brick_x_start = (x_screen_end + x_screen_start)/2 - 2
     brick_y_start = (y_screen_end + y_screen_start)/2 - 8
     #the fixed or unbreakable bricks and dynamic break
-    if level == 1:
-        for i in range(5):
-            for j in range(5):
-                if i == j:
-                    fixed_brick = Fixed_Brick(brick_x_start, brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2)
-                    fixed_bricks.append(fixed_brick)
+    # if level == 1:
+    #     for i in range(5):
+    #         for j in range(5):
+    #             if i == j:
+    #                 fixed_brick = Fixed_Brick(brick_x_start, brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2)
+    #                 fixed_bricks.append(fixed_brick)
         
-                else:
-                    dynamic_brick = Dynamic_Brick(brick_x_start ,brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2 , random.randint(1,3) , random.randint(0,6), random.randint(0,1))
-                    dynamic_bricks.append(dynamic_brick)
+    #             else:
+    #                 dynamic_brick = Dynamic_Brick(brick_x_start ,brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2 , random.randint(1,3) , random.randint(0,6), random.randint(0,1))
+    #                 dynamic_bricks.append(dynamic_brick)
     
-            brick_x_start = brick_x_start + 1
+    #         brick_x_start = brick_x_start + 1
     
-    brick_x_start = (x_screen_end + x_screen_start)/2 - 2
-    brick_y_start = (y_screen_end + y_screen_start)/2 - 8
+    # brick_x_start = (x_screen_end + x_screen_start)/2 - 2
+    # brick_y_start = (y_screen_end + y_screen_start)/2 - 8
 
-    if level == 2 or level == 3:
-        for i in range(5):
-            for j in range(5):
-                if (4 - i) == j:
-                    fixed_brick = Fixed_Brick(brick_x_start, brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2)
-                    fixed_bricks.append(fixed_brick)
+    # if level == 2 or level == 3:
+    #     for i in range(5):
+    #         for j in range(5):
+    #             if (4 - i) == j:
+    #                 fixed_brick = Fixed_Brick(brick_x_start, brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2)
+    #                 fixed_bricks.append(fixed_brick)
         
-                else:
-                    dynamic_brick = Dynamic_Brick(brick_x_start ,brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2 , random.randint(1,3) , random.randint(0,6), random.randint(0,1))
-                    dynamic_bricks.append(dynamic_brick)
+    #             else:
+    #                 dynamic_brick = Dynamic_Brick(brick_x_start ,brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2 , random.randint(1,3) , random.randint(0,7), random.randint(0,1))
+    #                 dynamic_bricks.append(dynamic_brick)
     
-            brick_x_start = brick_x_start + 1
+    #         brick_x_start = brick_x_start + 1
 
-    # dynamic_brick = Dynamic_Brick(brick_x_start + 2 , brick_y_start + 6, brick_x_start + 2, brick_y_start + 8 , 1 , 1,1)
-    # dynamic_bricks.append(dynamic_brick)
+    dynamic_brick = Dynamic_Brick(brick_x_start + 2 , brick_y_start + 6, brick_x_start + 2, brick_y_start + 8 , 1 , 7,0)
+    dynamic_bricks.append(dynamic_brick)
 
-    # dynamic_brick = Dynamic_Brick(brick_x_start , brick_y_start + 6, brick_x_start, brick_y_start + 8 , 3 , 1,0)
-    # dynamic_bricks.append(dynamic_brick)  
+    dynamic_brick = Dynamic_Brick(brick_x_start , brick_y_start + 5, brick_x_start, brick_y_start + 7 , 3 , 1,1)
+    dynamic_bricks.append(dynamic_brick)
+
+    dynamic_brick = Dynamic_Brick(brick_x_start , brick_y_start + 9, brick_x_start, brick_y_start + 11 , 3 , 1,0)
+    dynamic_bricks.append(dynamic_brick)  
     
     global collision
     # initialise Collision
@@ -140,10 +144,13 @@ def Initialisation(level):
     global dropdowns
     dropdowns = []
 
+    global blasters
+    blasters = []
+
     global powerup_times
     powerup_times = []
 
-    for i in range(6):
+    for i in range(7):
         powerup_time = PowerupTime()
         powerup_times.append(powerup_time)
 
@@ -153,7 +160,8 @@ game_over = GameOver()
 total_bricks_destroyed = 0
 # flag for ball and board to be together
 flag_together = 0 
-flag_grab = 0         
+flag_grab = 0
+last_launch = 0         
 
 update_ball_lives = 0
 while 1:
@@ -180,6 +188,7 @@ while 1:
         game_screen.PrintBoard(board)
         game_screen.PrintBricks(fixed_bricks , dynamic_bricks)
         game_screen.PrintDropDowns(dropdowns)
+        game_screen.PrintBlasters(blasters)
 
         # taking input
         char = ''
@@ -229,6 +238,23 @@ while 1:
                 if ball.together == 1:
                     ball.move_ball_speed()
             player.set_run_time(int(time.time() - start_run_time))
+
+        # shooting blasters
+        # making blasters
+        if board.activate_shoot == 1 and int(time.time() - last_launch) == 1:
+            last_launch = int(time.time())
+            new_blaster_1 = Blaster(board.x_pos - 1 , board.y_pos + (board.length - 1 - (board.length/2)))
+            new_blaster_2 = Blaster(board.x_pos - 1 , board.y_pos + (0 - (board.length/2)))
+            blasters.append(new_blaster_1)
+            blasters.append(new_blaster_2)
+        # move blaster
+        for blaster in blasters:
+            blaster.move_blaster()
+
+        # show time
+        if board.activate_shoot == 1:
+            print_there(10 , (y_screen_end + y_screen_start)/2 , 'Blaster Time : ' + str(int(time.time() - powerup_times[6].start_time)))        
+
 
         for ball in balls:
             # Collisions
@@ -281,20 +307,54 @@ while 1:
                         total_bricks_destroyed = total_bricks_destroyed + 1
                         upd_score = dynamic_brick.strength * 10
                         if dynamic_brick.typeofdropdown != 0:
-                            dropdown = DropDown(dynamic_brick.x_start_pos , dynamic_brick.y_start_pos, dynamic_brick.typeofdropdown)
+                            dropdown = DropDown(dynamic_brick.x_start_pos , dynamic_brick.y_start_pos, dynamic_brick.typeofdropdown,ball.x_speed,ball.y_speed , -4)
                             dropdowns.append(dropdown)
                     collision.Collision_ball_dynamic_brick(ball , dynamic_brick)
     
                     player.update_score(upd_score)    
                     break
 
+        # Blasters
+        for blaster in blasters:
+            # Collision with Fixed Bricks
+            for fixed_brick in fixed_bricks:
+                if ball.x_pos == fixed_brick.x_start_pos and ball.y_pos >= fixed_brick.y_start_pos and ball.y_pos <= fixed_brick.y_end_pos:
+                    print_there(blaster.x_pos , blaster.y_pos , ' ')
+                    print_there(blaster.x_pos + 1, blaster.y_pos , ' ')
+                    blasters.remove(blaster)
+                    break
+
+            # collision with dynamic bricks
+            for dynamic_brick in dynamic_bricks:
+                if blaster.x_pos <= dynamic_brick.x_start_pos and blaster.y_pos >= dynamic_brick.y_start_pos and blaster.y_pos <= dynamic_brick.y_end_pos and dynamic_brick.strength > 0:
+                    upd_score = 10
+                    dynamic_brick.change_rainbow()
+                    if dynamic_brick.strength == 1:
+                        total_bricks_destroyed = total_bricks_destroyed + 1
+                        if dynamic_brick.typeofdropdown != 0:
+                            dropdown = DropDown(dynamic_brick.x_start_pos , dynamic_brick.y_start_pos, dynamic_brick.typeofdropdown,1,0 , 0)
+                            dropdowns.append(dropdown)
+                    dynamic_brick.dec_str(0)
+                    player.update_score(upd_score)
+                    print_there(blaster.x_pos , blaster.y_pos , ' ')
+                    print_there(blaster.x_pos + 1, blaster.y_pos , ' ')
+                    blasters.remove(blaster)
+                    break        
+
+            # collision with upper roof
+            if blaster.x_pos <= game_screen.x_map_begin:
+                print_there(blaster.x_pos , blaster.y_pos , ' ')
+                print_there(blaster.x_pos + 1, blaster.y_pos , ' ')
+                blasters.remove(blaster)        
+
         # Dropdowns
         for dropdown in dropdowns:
             dropdown.move_dropdown()
             check_collision_with_board = collision.Collision_board_dropdown(board , dropdown)
+            # collision.Collision_dropdown_sidewalls(dropdown , game_screen.x_map_begin , game_screen.y_map_begin , game_screen.y_map_end)
             if check_collision_with_board == 1:
                 powerup = dropdown.type_of_power
-                print_there(dropdown.x_pos - 1, dropdown.y_pos , '    ')
+                print_there(dropdown.x_pos_prev , dropdown.y_pos_prev , '    ')
                 print_there(dropdown.x_pos , dropdown.y_pos , '    ')
                 dropdowns.remove(dropdown)
                 if powerup == 1:
@@ -327,17 +387,26 @@ while 1:
                     flag_grab = 1
                     board.inc_speed_board(1)
 
+                elif powerup == 7:
+                    # Shooting paddles
+                    board.activate_blasters()
+
                 if powerup_times[powerup - 1].total_time == 0:
                     powerup_times[powerup - 1].start_time = time.time()
+                    if powerup == 7:
+                        last_launch = int(powerup_times[6].start_time)
                     powerup_times[powerup - 1].total_time = 10
 
                 else:
                     powerup_times[powerup - 1].total_time = powerup_times[powerup - 1].total_time  + 10          
 
                 continue
-            check_collision_with_wall = collision.Collision_dropdown_wall(board , game_screen.x_map_end)
+            check_collision_with_wall = collision.Collision_dropdown_wall(dropdown , game_screen.x_map_end)
             if check_collision_with_wall == 1:
-                print_there(dropdown.x_pos , dropdown.y_pos , ' ')
+                # dropdown.x_speed = -1 * dropdown.x_speed
+                print_there(dropdown.x_pos , dropdown.y_pos , '     ')
+                print_there(dropdown.x_pos_prev , dropdown.y_pos_prev , '    ')
+                print_there(dropdown.x_pos + dropdown.x_speed, dropdown.y_pos + dropdown.y_speed , '    ')
                 dropdowns.remove(dropdown)
 
         for i in range(len(powerup_times)):
@@ -363,7 +432,16 @@ while 1:
 
                     elif i == 5:
                         flag_grab = 0
-                        board.inc_speed_board(5)                
+                        board.inc_speed_board(5)
+
+                    elif i == 6:
+                        # disable shooting
+                        board.deactivate_blasters()
+                        print_there(10 , (y_screen_end + y_screen_start)/2 , '                   ')
+                        print_there(board.x_pos_prev - 1 , board.y_pos_prev + (0 - (board.length/2)) , ' ')
+                        print_there(board.x_pos_prev - 1 , board.y_pos_prev + (board.length_prev - 1 - (board.length/2)) , ' ')
+                        print_there(board.x_pos - 1 , board.y_pos + (0 - (board.length/2)) , ' ')
+                        print_there(board.x_pos - 1 , board.y_pos + (board.length - 1 - (board.length/2)) , ' ')                                
 
         # Game Over
         for ball in balls:

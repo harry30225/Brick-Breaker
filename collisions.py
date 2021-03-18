@@ -48,8 +48,18 @@ class Collision:
         return 0
 
     def Collision_dropdown_wall(self , dropdown , x_map_end):
-        if x_map_end == dropdown.x_pos:
+        if x_map_end <= dropdown.x_pos and x_map_end >= dropdown.x_pos_prev:
             return 1
 
-        return 0    
+        return 0
+
+    def Collision_dropdown_sidewalls(self, dropdown , x_map_begin , y_map_begin , y_map_end):
+        # upper collision
+        if (dropdown.x_pos <= x_map_begin) and (dropdown.x_pos_prev >= x_map_begin):
+            dropdown.change_xspeed()
+
+        # left right collsion
+        if ((dropdown.y_pos <= y_map_begin) and (dropdown.y_pos_prev >= y_map_begin)) or ((dropdown.y_pos >= y_map_end) and (dropdown.y_pos_prev) <= y_map_end):
+            dropdown.change_yspeed()
+
         

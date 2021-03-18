@@ -46,6 +46,7 @@ class Board:
         self.x_pos_prev = x_screen_end - 3
         self.y_pos_prev = ( y_screen_start + y_screen_end ) / 2
         self.length_prev = 5
+        self.activate_shoot = 0
 
     def move_board(self , dir):
         if dir == 1:
@@ -70,7 +71,13 @@ class Board:
     def dec_length_board(self):
         if self.length > 1:
             self.length = int(self.length / 2)
-            self.length_prev = self.length        
+            self.length_prev = self.length
+
+    def activate_blasters(self):
+        self.activate_shoot = 1
+
+    def deactivate_blasters(self):
+        self.activate_shoot = 0                    
 
 # ball
 class Ball:

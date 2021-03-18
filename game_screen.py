@@ -50,6 +50,12 @@ class Game_Screen:
         for i in range(board.length):
             print_there(board.x_pos , board.y_pos + ( i - (board.length / 2)), '=')
 
+        if board.activate_shoot == 1:
+            print_there(board.x_pos_prev - 1 , board.y_pos_prev + (0 - (board.length/2)) , ' ')
+            print_there(board.x_pos_prev - 1 , board.y_pos_prev + (board.length_prev - 1 - (board.length/2)) , ' ')
+            print_there(board.x_pos - 1 , board.y_pos + (0 - (board.length/2)) ,Fore.RED +  '!' + Style.RESET_ALL)
+            print_there(board.x_pos - 1 , board.y_pos + (board.length - 1 - (board.length/2)) , Fore.RED + '!' + Style.RESET_ALL)    
+
     def PrintBricks(self , fixed_bricks , dynamic_bricks):
         for fix_brick in fixed_bricks:
             if fix_brick.strength == 100:
@@ -92,7 +98,7 @@ class Game_Screen:
 
     def PrintDropDowns(self , dropdowns):
         for dropdown in dropdowns:
-            print_there(dropdown.x_pos - 1 , dropdown.y_pos , '    ')
+            print_there(dropdown.x_pos_prev , dropdown.y_pos_prev , '    ')
             if dropdown.type_of_power == 1:
                 print_there(dropdown.x_pos , dropdown.y_pos , Fore.BLUE + '[+]' + Style.RESET_ALL)
 
@@ -109,7 +115,18 @@ class Game_Screen:
                 print_there(dropdown.x_pos , dropdown.y_pos , Fore.LIGHTRED_EX + '[O]' + Style.RESET_ALL)
 
             elif dropdown.type_of_power == 6:
-                print_there(dropdown.x_pos , dropdown.y_pos , Fore.WHITE + '[_*]' + Style.RESET_ALL)                                
+                print_there(dropdown.x_pos , dropdown.y_pos , Fore.WHITE + '[_*]' + Style.RESET_ALL)
+
+            elif dropdown.type_of_power == 7:
+                print_there(dropdown.x_pos , dropdown.y_pos , Fore.LIGHTGREEN_EX + '[!!]' + Style.RESET_ALL)      
+
+            if dropdown.gravity != 0:
+                dropdown.change_gravity()
+
+    def PrintBlasters(self, blasters):
+        for blaster in blasters:
+            print_there(blaster.x_pos + 1, blaster.y_pos , ' ')
+            print_there(blaster.x_pos , blaster.y_pos , Fore.LIGHTBLUE_EX + '|' + Style.RESET_ALL)                                              
 
     def PrintRestartGameLost(self , player , ball):
         print_there((x_screen_end + x_screen_start)/2 , (y_screen_start + y_screen_end ) / 2 , Fore.MAGENTA + 'Balls Left: ' + str(ball.lives) + Style.RESET_ALL)
