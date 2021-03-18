@@ -9,15 +9,31 @@ class User:
         self.score = 0
         self.lives = 3
         self.time = 0
+        self.level = 1
 
     def dec_live_user(self):
         self.lives = self.lives - 1
+
+    def lost_lives(self):
+        self.lives = 1    
 
     def update_score(self , score):
         self.score = self.score + score 
 
     def set_run_time(self,time):
-        self.time = time           
+        self.time = time 
+
+    def inc_level(self):
+        self.level = self.level + 1
+
+    def reset_score(self):
+        self.score = 0
+
+    def reset_attri(self):
+        self.score = 0
+        self.lives = 3
+        self.time = 0
+        self.level = 1                      
 
 
 # Board
@@ -135,27 +151,42 @@ class Ball:
 
 # Brick
 class Brick:
-    def __init__(self , x_start_pos , y_start_pos , x_end_pos, y_end_pos,strength , typeofdropdown):
+    def __init__(self , x_start_pos , y_start_pos , x_end_pos, y_end_pos,strength , typeofdropdown , rainbow):
         self.x_start_pos = x_start_pos
         self.y_start_pos = y_start_pos
         self.x_end_pos = x_end_pos
         self.y_end_pos = y_end_pos
         self.strength = strength
         self.typeofdropdown = typeofdropdown
+        self.rainbow = rainbow
 
 class Fixed_Brick(Brick):
     def __init__(self , x_start_pos , y_start_pos , x_end_pos, y_end_pos):
-        super().__init__(x_start_pos , y_start_pos , x_end_pos, y_end_pos, 100 , 0)
+        super().__init__(x_start_pos , y_start_pos , x_end_pos, y_end_pos, 100 , 0 , 0)
 
-    def dec_str():
-        self.strenth = 0    
+    def dec_str(self):
+        self.strength = 0
+
+    def dec_pos(self):
+        self.x_start_pos = self.x_start_pos + 1
+        self.x_end_pos = self.x_end_pos + 1        
 
 class Dynamic_Brick(Brick):
-    def __init__(self , x_start_pos , y_start_pos , x_end_pos, y_end_pos, strength, typeofdropdown):
-        super().__init__(x_start_pos , y_start_pos , x_end_pos, y_end_pos, strength, typeofdropdown)
+    def __init__(self , x_start_pos , y_start_pos , x_end_pos, y_end_pos, strength, typeofdropdown , rainbow):
+        super().__init__(x_start_pos , y_start_pos , x_end_pos, y_end_pos, strength, typeofdropdown , rainbow)
 
     def dec_str(self , destroy):
         if destroy == 1:
             self.strength = 0
         else:
-            self.strength = self.strength - 1            
+            self.strength = self.strength - 1
+
+    def dec_pos(self):
+        self.x_start_pos = self.x_start_pos + 1
+        self.x_end_pos = self.x_end_pos + 1
+
+    def change_strength(self,strength):
+        self.strength = strength
+
+    def change_rainbow(self):
+        self.rainbow = 0                           

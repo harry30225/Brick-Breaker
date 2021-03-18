@@ -2,6 +2,7 @@ import os
 import sys
 from config import *
 from colorama import Fore, Back , Style
+import random
 
 
 # Print at desired position
@@ -21,6 +22,7 @@ class Game_Screen:
         print_there(6 , (y_screen_start + y_screen_end ) / 2 , 'Time : ' + str(player.time))
         print_there(4 , (y_screen_start + y_screen_end ) / 2 , 'BRICK BREAKER')
         print_there(6 , y_screen_end - 8 , 'Lives : ' + str(player.lives))
+        print_there(8,(y_screen_start + y_screen_end)/2 , 'Level : ' + str(player.level))
         for i in range(y_screen_end - y_screen_start + 1):
             print_there(12, i+3, 'X')
 
@@ -59,6 +61,8 @@ class Game_Screen:
                 print_there(fix_brick.x_start_pos, fix_brick.y_end_pos , ' ')
 
         for dynamic_brick in dynamic_bricks:
+            if dynamic_brick.rainbow == 1:
+                dynamic_brick.change_strength(random.randint(1,3))
             if dynamic_brick.strength == 1:
                 print_there(dynamic_brick.x_start_pos, dynamic_brick.y_start_pos , Fore.YELLOW + '|' + Style.RESET_ALL)
                 print_there(dynamic_brick.x_end_pos, dynamic_brick.y_end_pos , Fore.YELLOW + '|' + Style.RESET_ALL)
@@ -74,6 +78,17 @@ class Game_Screen:
             elif dynamic_brick.strength == 0:
                 print_there(dynamic_brick.x_start_pos, dynamic_brick.y_start_pos , ' ')
                 print_there(dynamic_brick.x_end_pos, dynamic_brick.y_end_pos , ' ')
+
+    def PrintClearBricks(self,fixed_bricks,dynamic_bricks):
+        for fix_brick in fixed_bricks:
+            print_there(fix_brick.x_start_pos, fix_brick.y_start_pos , ' ')
+            print_there(fix_brick.x_start_pos, fix_brick.y_end_pos , ' ')
+
+        for dynamic_brick in dynamic_bricks:
+            print_there(dynamic_brick.x_start_pos, dynamic_brick.y_start_pos , ' ')
+            print_there(dynamic_brick.x_end_pos, dynamic_brick.y_end_pos , ' ')
+
+
 
     def PrintDropDowns(self , dropdowns):
         for dropdown in dropdowns:
@@ -116,5 +131,9 @@ class Game_Screen:
         print_there((x_screen_end + x_screen_start) / 2 , (y_screen_end + y_screen_start) / 2 , Fore.BLUE + 'You Have Won !!!' + Style.RESET_ALL)
         print_there((x_screen_end + x_screen_start) / 2 + 2 , (y_screen_end + y_screen_start) / 2 , Fore.MAGENTA + 'Score : ' + str(player.score) + Style.RESET_ALL)
         print_there((x_screen_end + x_screen_start) / 2 + 4 , (y_screen_end + y_screen_start) / 2 , Fore.WHITE + 'Time Taken : ' + str(player.time) + Style.RESET_ALL)
-        print_there((x_screen_end + x_screen_start) / 2 + 6 , (y_screen_end + y_screen_start) / 2 , Fore.YELLOW + 'Start New Game Press h' + Style.RESET_ALL)
+        if player.level < 3:
+            print_there((x_screen_end + x_screen_start) / 2 + 6 , (y_screen_end + y_screen_start) / 2 , Fore.YELLOW + 'Start Next Level Press h' + Style.RESET_ALL)
+
+        if player.level == 3:    
+            print_there((x_screen_end + x_screen_start) / 2 + 6 , (y_screen_end + y_screen_start) / 2 , Fore.YELLOW + 'Start New Game Press h' + Style.RESET_ALL)
         print_there((x_screen_end + x_screen_start) / 2 + 8 , (y_screen_end + y_screen_start) / 2 , Fore.RED + 'Quit Game Press q' + Style.RESET_ALL)

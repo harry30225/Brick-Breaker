@@ -77,7 +77,7 @@ isInitialise = 0
 isGameLost = 0
 isGameWon = 0
 
-def Initialisation():
+def Initialisation(level):
     
     global balls
     # initalise ball
@@ -98,21 +98,39 @@ def Initialisation():
     brick_x_start = (x_screen_end + x_screen_start)/2 - 2
     brick_y_start = (y_screen_end + y_screen_start)/2 - 8
     #the fixed or unbreakable bricks and dynamic break
-    for i in range(5):
-        for j in range(5):
-            if i == j:
-                fixed_brick = Fixed_Brick(brick_x_start, brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2)
-                fixed_bricks.append(fixed_brick)
+    if level == 1:
+        for i in range(5):
+            for j in range(5):
+                if i == j:
+                    fixed_brick = Fixed_Brick(brick_x_start, brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2)
+                    fixed_bricks.append(fixed_brick)
+        
+                else:
+                    dynamic_brick = Dynamic_Brick(brick_x_start ,brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2 , random.randint(1,3) , random.randint(0,6), random.randint(0,1))
+                    dynamic_bricks.append(dynamic_brick)
     
-            else:
-                dynamic_brick = Dynamic_Brick(brick_x_start ,brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2 , random.randint(1,3) , random.randint(0,6))
-                dynamic_bricks.append(dynamic_brick)
+            brick_x_start = brick_x_start + 1
+    
+    brick_x_start = (x_screen_end + x_screen_start)/2 - 2
+    brick_y_start = (y_screen_end + y_screen_start)/2 - 8
 
-        brick_x_start = brick_x_start + 1        
-    # dynamic_brick = Dynamic_Brick(brick_x_start + 2 , brick_y_start + 6, brick_x_start + 2, brick_y_start + 8 , 1 , 1)
+    if level == 2 or level == 3:
+        for i in range(5):
+            for j in range(5):
+                if (4 - i) == j:
+                    fixed_brick = Fixed_Brick(brick_x_start, brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2)
+                    fixed_bricks.append(fixed_brick)
+        
+                else:
+                    dynamic_brick = Dynamic_Brick(brick_x_start ,brick_y_start + 3*j , brick_x_start , brick_y_start + 3*j + 2 , random.randint(1,3) , random.randint(0,6), random.randint(0,1))
+                    dynamic_bricks.append(dynamic_brick)
+    
+            brick_x_start = brick_x_start + 1
+
+    # dynamic_brick = Dynamic_Brick(brick_x_start + 2 , brick_y_start + 6, brick_x_start + 2, brick_y_start + 8 , 1 , 1,1)
     # dynamic_bricks.append(dynamic_brick)
 
-    # dynamic_brick = Dynamic_Brick(brick_x_start , brick_y_start + 6, brick_x_start, brick_y_start + 8 , 3 , 1)
+    # dynamic_brick = Dynamic_Brick(brick_x_start , brick_y_start + 6, brick_x_start, brick_y_start + 8 , 3 , 1,0)
     # dynamic_bricks.append(dynamic_brick)  
     
     global collision
@@ -144,12 +162,9 @@ while 1:
     # clear()
     hide_cursor()
     if isInitialise == 0:
-        Initialisation()
+        Initialisation(player.level)
         if player.lives == 0:
-            player.score = 0
-            player.lives = 3
-            player.time = 0
-        player.score = 0
+            player.reset_attri()
         player.time = 0
         for ball in balls:
             ball.update_live(update_ball_lives)
@@ -201,6 +216,9 @@ while 1:
                         board.inc_speed_board(5)    
             char = ''
 
+        elif char == 's' or char == 'S':
+            isGameWon = 1    
+
         elif char == 'q' or char == 'Q':
             Print('End')
             sys.exit(0)
@@ -229,6 +247,23 @@ while 1:
                     board.inc_speed_board(1)
                     ball.x_pos = ball.x_pos - 1
 
+                # falling bricks
+                if collision_board == 1 and int(time.time() - start_run_time) > 5:
+                    game_screen.PrintClearBricks(fixed_bricks,dynamic_bricks)
+                    for fixed_brick in fixed_bricks:
+                        fixed_brick.dec_pos()
+                        if fixed_brick.x_start_pos >= board.x_pos:
+                            isGameLost = 1
+                            player.lost_lives()
+                            break
+                    
+                    for dynamic_brick in dynamic_bricks:
+                        dynamic_brick.dec_pos()
+                        if dynamic_brick.x_start_pos >= board.x_pos:
+                            isGameLost = 1
+                            player.lost_lives()
+                            break        
+
             # Collision with Fixed Bricks
             for fixed_brick in fixed_bricks:
                 if ball.x_pos == fixed_brick.x_start_pos and ball.y_pos >= fixed_brick.y_start_pos and ball.y_pos <= fixed_brick.y_end_pos:
@@ -241,6 +276,7 @@ while 1:
             for dynamic_brick in dynamic_bricks:
                 if ball.x_pos == dynamic_brick.x_start_pos and ball.y_pos >= dynamic_brick.y_start_pos and ball.y_pos <= dynamic_brick.y_end_pos and dynamic_brick.strength > 0:
                     upd_score = 10
+                    dynamic_brick.change_rainbow()
                     if dynamic_brick.strength == 1 or ball.super_strength == 100:
                         total_bricks_destroyed = total_bricks_destroyed + 1
                         upd_score = dynamic_brick.strength * 10
@@ -369,6 +405,7 @@ while 1:
             isInitialise = 0
             flag_together = 0
             flag_grab = 0
+            player.reset_score()
             for ball in balls:
                 update_ball_lives = ball.lives
                 if ball.lives == 0 and player.lives > 0:
@@ -396,6 +433,11 @@ while 1:
             isInitialise = 0
             flag_together = 0
             flag_grab = 0
+            if player.level < 3:
+                player.inc_level()
+
+            else:
+                player.level = 1    
             char = ''
             clear = lambda: os.system('clear')
             clear()
