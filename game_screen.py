@@ -97,6 +97,28 @@ class Game_Screen:
                 print_there(dynamic_brick.get_xstartpos(), dynamic_brick.get_ystartpos() , ' ')
                 print_there(dynamic_brick.get_xendpose(), dynamic_brick.get_yendpose() , ' ')
 
+    def PrintDefensiveLayer(self , health , defensive_bricks):
+        if int(health) <= 40:
+            for dynamic_brick in defensive_bricks:
+                if dynamic_brick.get_rainbow() == 1:
+                    dynamic_brick.change_strength(random.randint(1,3))
+                if dynamic_brick.get_strength() == 1:
+                    print_there(dynamic_brick.get_xstartpos(), dynamic_brick.get_ystartpos() , Fore.YELLOW + '|' + Style.RESET_ALL)
+                    print_there(dynamic_brick.get_xendpose(), dynamic_brick.get_yendpose() , Fore.YELLOW + '|' + Style.RESET_ALL)
+    
+                elif dynamic_brick.strength == 2:
+                    print_there(dynamic_brick.get_xstartpos(), dynamic_brick.get_ystartpos() , Fore.BLUE + '|' + Style.RESET_ALL)
+                    print_there(dynamic_brick.get_xendpose(), dynamic_brick.get_yendpose() , Fore.BLUE + '|' + Style.RESET_ALL)
+    
+                elif dynamic_brick.strength == 3:
+                    print_there(dynamic_brick.get_xstartpos(), dynamic_brick.get_ystartpos() , Fore.RED + '|' + Style.RESET_ALL)
+                    print_there(dynamic_brick.get_xendpose(), dynamic_brick.get_yendpose() , Fore.RED + '|' + Style.RESET_ALL)
+    
+                elif dynamic_brick.strength == 0:
+                    print_there(dynamic_brick.get_xstartpos(), dynamic_brick.get_ystartpos() , ' ')
+                    print_there(dynamic_brick.get_xendpose(), dynamic_brick.get_yendpose() , ' ')
+
+
     def PrintClearBricks(self,fixed_bricks,dynamic_bricks):
         for fix_brick in fixed_bricks:
             print_there(fix_brick.get_xstartpos(), fix_brick.get_ystartpos() , ' ')

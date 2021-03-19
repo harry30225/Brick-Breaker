@@ -157,12 +157,21 @@ def Initialisation(level):
     global bombs
     bombs = []
 
+    global defensive_bricks
+    defensive_bricks = []
+
     global powerup_times
     powerup_times = []
 
     for i in range(7):
         powerup_time = PowerupTime()
         powerup_times.append(powerup_time)
+
+def defensive_layer(x_start , y_start):
+    k = 0
+    for i in range(35):
+        dynamic_brick = Dynamic_Brick(x_start , y_start + 3*i , x_start, y_start + 3*i + 2, random.randint(1,3), 0,0)
+        defensive_bricks.append(dynamic_brick)        
 
 # game over
 game_over = GameOver()
@@ -172,7 +181,8 @@ total_bricks_destroyed = 0
 flag_together = 0 
 flag_grab = 0
 last_launch_blaster = 0
-last_launch_bomb = 0         
+last_launch_bomb = 0
+get_defensive = 0         
 
 update_ball_lives = 0
 while 1:
@@ -202,7 +212,11 @@ while 1:
 
         if player.get_level() == 3:
             game_screen.PrintBossEnemy(bossenemy)
-            game_screen.PrintBossEnemyLife(bossenemy.get_health())    
+            game_screen.PrintBossEnemyLife(bossenemy.get_health())
+            if bossenemy.get_health() <= 40 and get_defensive == 1:
+                game_screen.PrintDefensiveLayer(bossenemy.get_health() , defensive_bricks)
+            if bossenemy.get_health() <= 20 and get_defensive == 0:
+                game_screen.PrintDefensiveLayer(bossenemy.get_health() , defensive_bricks)        
         game_screen.PrintDropDowns(dropdowns)
         game_screen.PrintBlasters(blasters)
         game_screen.PrintBombs(bombs)
@@ -293,7 +307,19 @@ while 1:
     
             # move bomb
             for bomb in bombs:
-                bomb.move_bomb()    
+                bomb.move_bomb()
+
+        # defense layer
+        if player.get_level() == 3:
+            if bossenemy.get_health() <= 40 and get_defensive == 0:
+                # make defense layer
+                get_defensive = 1
+                defensive_layer((game_screen.get_xmapbegin() + game_screen.get_xmapend())/2 , game_screen.get_ymapbegin() + 1)
+
+            if bossenemy.get_health() <= 20 and get_defensive == 1:
+                # make defense layer 
+                get_defensive = 0
+                defensive_layer((game_screen.get_xmapbegin() + game_screen.get_xmapend())/2 , game_screen.get_ymapbegin() + 1)         
 
         for ball in balls:
             # Collisions
@@ -367,8 +393,28 @@ while 1:
                 check_collision_with_boss = collision.Collision_ball_bossenemy(ball,bossenemy)
 
                 if check_collision_with_boss == 1:
+                    player.update_score(10)
                     bossenemy.dec_health()
                     os.system("aplay ./Sounds/bossenemyhit.wav &")
+
+                # collision with defensive layers
+                for dynamic_brick in defensive_bricks:
+                    if ball.get_xpos() == dynamic_brick.get_xstartpos() and ball.get_ypos() >= dynamic_brick.get_ystartpos() and ball.get_ypos() <= dynamic_brick.get_yendpose() and dynamic_brick.get_strength() > 0:
+                        upd_score = 10
+                        #dynamic_brick.change_rainbow()
+                        os.system("aplay ./Sounds/brick_hit.wav &")
+                        if dynamic_brick.get_strength() == 1:
+                            total_bricks_destroyed = total_bricks_destroyed + 1
+                            upd_score = dynamic_brick.get_strength() * 10
+                            if dynamic_brick.get_typeofdropdown() != 0:
+                                os.system("aplay ./Sounds/dropdown.wav &")
+                                dropdown = DropDown(dynamic_brick.get_xstartpos() , dynamic_brick.get_ystartpos(), dynamic_brick.get_typeofdropdown(),ball.get_xspeed(),ball.get_yspeed() , -4)
+                                dropdowns.append(dropdown)
+                        collision.Collision_ball_dynamic_brick(ball , dynamic_brick)
+        
+                        player.update_score(upd_score)    
+                        break
+                    
 
         # Blasters
         for blaster in blasters:
@@ -545,7 +591,13 @@ while 1:
             if gamewon == 1:
                 isGameWon = 1
                 end_run_time = time.time()
-                player.set_run_time(int(end_run_time - start_run_time))    
+                player.set_run_time(int(end_run_time - start_run_time))
+
+        if player.get_level() == 3:
+            if bossenemy.get_health() == 0:
+                isGameWon = 1
+                end_run_time = time.time()
+                player.set_run_time(int(end_run_time - start_run_time))            
 
     elif isGameLost == 1:
         clear = lambda: os.system('clear')
