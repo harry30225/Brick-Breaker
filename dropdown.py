@@ -12,6 +12,30 @@ class DropDown:
         self.x_pos_prev = x_pos
         self.y_pos_prev = y_pos
 
+    def get_xpos(self):
+        return self.x_pos
+
+    def get_ypos(self):
+        return self.y_pos
+
+    def get_xposprev(self):
+        return self.x_pos_prev
+
+    def get_yposprev(self):
+        return self.y_pos_prev
+
+    def get_xspeed(self):
+        return self.x_speed
+
+    def get_yspeed(self):
+        return self.y_speed
+
+    def get_typeofpower(self):
+        return self.type_of_power
+
+    def get_gravity(self):
+        return self.gravity           
+
     def move_dropdown(self):
         self.x_pos_prev = self.x_pos
         self.y_pos_prev = self.y_pos
@@ -28,7 +52,7 @@ class DropDown:
         if self.gravity == 0:
             self.x_speed = 1
             self.y_speed = self.y_speed
-            
+
 
     def change_xspeed(self):
         self.x_speed = -1 * self.x_speed

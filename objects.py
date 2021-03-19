@@ -11,6 +11,18 @@ class User:
         self.time = 0
         self.level = 1
 
+    def get_score(self):
+        return self.score
+
+    def get_lives(self):
+        return self.lives
+
+    def get_time(self):
+        return self.time
+
+    def get_level(self):
+        return self.level               
+
     def dec_live_user(self):
         self.lives = self.lives - 1
 
@@ -22,6 +34,9 @@ class User:
 
     def set_run_time(self,time):
         self.time = time 
+    
+    def set_level(self, level):
+        self.level = level
 
     def inc_level(self):
         self.level = self.level + 1
@@ -47,6 +62,30 @@ class Board:
         self.y_pos_prev = ( y_screen_start + y_screen_end ) / 2
         self.length_prev = 5
         self.activate_shoot = 0
+
+    def get_xpos(self):
+        return self.x_pos
+
+    def get_ypos(self):
+        return self.y_pos
+
+    def get_xposprev(self):
+        return self.x_pos_prev
+
+    def get_yposprev(self):
+        return self.y_pos_prev
+
+    def get_length(self):
+        return self.length
+
+    def get_lengthprev(self):
+        return self.length_prev
+
+    def get_speed(self):
+        return self.speed
+
+    def get_activateshoot(self):
+        return self.activate_shoot                            
 
     def move_board(self , dir):
         if dir == 1:
@@ -92,6 +131,42 @@ class Ball:
         self.super_strength = 0
         self.together = 0
 
+    def get_xpos(self):
+        return self.x_pos
+
+    def get_ypos(self):
+        return self.y_pos
+
+    def get_xposprev(self):
+        return self.x_pos_prev
+
+    def get_yposprev(self):
+        return self.y_pos_prev
+
+    def get_xspeed(self):
+        return self.x_speed
+
+    def get_yspeed(self):
+        return self.y_speed
+
+    def get_lives(self):
+        return self.lives
+
+    def get_superstrength(self):
+        return self.super_strength
+
+    def get_together(self):
+        return self.together                 
+    
+    def change_yspeed(self):
+        self.y_speed = -1 * self.y_speed
+
+    def change_xspeed(self):
+        self.x_speed = -1 * self.x_speed 
+
+    def change_yspeedbyvalue(self,value):
+        self.y_speed = value        
+    
     def change_together_status(self , status):
         self.together = status    
 
@@ -138,6 +213,9 @@ class Ball:
         self.x_speed = self.x_speed
         self.y_speed = 2 * self.y_speed
 
+    def dec_xpos(self):
+        self.x_pos = self.x_pos - 1    
+
     def dec_speed_ball(self):
         if self.y_speed > 1:
             self.y_speed = int(self.y_speed)     
@@ -154,7 +232,10 @@ class Ball:
         self.super_strength = ball.super_strength
         self.together = ball.together
         self.x_speed = -1 * ball.x_speed
-        self.y_speed =  -1 * ball.y_speed                                                       
+        self.y_speed =  -1 * ball.y_speed
+
+    def lost_lives(self):
+        self.lives = 0                                                           
 
 # Brick
 class Brick:
@@ -166,6 +247,27 @@ class Brick:
         self.strength = strength
         self.typeofdropdown = typeofdropdown
         self.rainbow = rainbow
+
+    def get_xstartpos(self):
+        return self.x_start_pos
+
+    def get_xendpose(self):
+        return self.x_end_pos
+
+    def get_ystartpos(self):
+        return self.y_start_pos
+
+    def get_yendpose(self):
+        return self.y_end_pos
+
+    def get_strength(self):
+        return self.strength
+
+    def get_typeofdropdown(self):
+        return self.typeofdropdown
+
+    def get_rainbow(self):
+        return self.rainbow                        
 
 class Fixed_Brick(Brick):
     def __init__(self , x_start_pos , y_start_pos , x_end_pos, y_end_pos):
@@ -196,4 +298,80 @@ class Dynamic_Brick(Brick):
         self.strength = strength
 
     def change_rainbow(self):
-        self.rainbow = 0                           
+        self.rainbow = 0
+
+
+class BossEnemy:
+    def __init__(self , x_pos_start , y_pos_start , x_pos_end , y_pos_end):
+        self.x_pos_start = x_pos_start
+        self.y_pos_start = y_pos_start
+        self.x_pos_end = x_pos_end
+        self.y_pos_end = y_pos_end
+        self.x_pos_start_prev = x_pos_start
+        self.y_pos_start_prev = y_pos_start
+        self.x_pos_end_prev = x_pos_end
+        self.y_pos_end_prev = y_pos_end
+        self.speed = 1
+        self.health = 100
+        self.start_bombs = 0
+
+    def get_xposstart(self):
+        return self.x_pos_start
+
+    def get_yposstart(self):
+        return self.y_pos_start
+
+    def get_xposstartprev(self):
+        return self.x_pos_start_prev
+
+    def get_yposstartprev(self):
+        return self.y_pos_start_prev    
+
+    def get_xposend(self):
+        return self.x_pos_end
+
+    def get_yposend(self):
+        return self.y_pos_end
+
+    def get_xposendprev(self):
+        return self.x_pos_end_prev
+
+    def get_yposendprev(self):
+        return self.y_pos_end_prev    
+
+    def get_health(self):
+        return self.health
+
+    def get_speed(self):
+        return self.speed
+
+    def get_startbombs(self):
+        return self.start_bombs    
+
+    def move_boss(self , dir):
+        if dir == 1:
+            if (self.y_pos_end + self.speed) <= y_screen_end - 50:
+                self.x_pos_start_prev = self.x_pos_start
+                self.y_pos_start_prev = self.y_pos_start
+                self.x_pos_end_prev = self.x_pos_end
+                self.y_pos_end_prev = self.y_pos_end
+                self.y_pos_start = self.y_pos_start + self.speed
+                self.y_pos_end = self.y_pos_end + self.speed
+
+        else:
+            if (self.y_pos_start - self.speed) >= y_screen_start + 50:
+                self.x_pos_start_prev = self.x_pos_start
+                self.y_pos_start_prev = self.y_pos_start
+                self.x_pos_end_prev = self.x_pos_end
+                self.y_pos_end_prev = self.y_pos_end
+                self.y_pos_start = self.y_pos_start - self.speed
+                self.y_pos_end = self.y_pos_end - self.speed 
+
+    def inc_speed_boss(self , speed):
+        self.speed = speed
+
+    def start_bombing(self):
+        self.start_bombs = 1
+
+    def dec_health(self):
+        self.health = self.health - 10                                           
